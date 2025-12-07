@@ -15,6 +15,8 @@ const baseDownloadsDir = path.join(__dirname, 'downloads');
 const videoDir = path.join(baseDownloadsDir, 'video');
 const audioDir = path.join(baseDownloadsDir, 'audio');
 
+const ongoingDownloads = new Map();
+
 function getDiskUsage() {
   try {
     const { execSync } = require('child_process');
@@ -182,6 +184,26 @@ function downloadVideo(videoUrl, format, callback) {
   });
 }
 
+function queueDownload(videoUrl, format, callback) {
+  const key = `${format}:${videoUrl}`;
+
+  const existing = ongoingDownloads.get(key);
+  if (existing) {
+    existing.callbacks.push(callback);
+    return;
+  }
+
+  const entry = { callbacks: [callback] };
+  ongoingDownloads.set(key, entry);
+
+  downloadVideo(videoUrl, format, (code, stdout, stderr, filePath, targetDir) => {
+    ongoingDownloads.delete(key);
+    for (const cb of entry.callbacks) {
+      cb(code, stdout, stderr, filePath, targetDir);
+    }
+  });
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = urlModule.parse(req.url, true);
 
@@ -221,7 +243,7 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify({ error: 'query param "url" wajib diisi' }));
       return;
     }
-    downloadVideo(videoUrl, formatParam, (code, stdout, stderr, filePath, targetDir) => {
+    queueDownload(videoUrl, formatParam, (code, stdout, stderr, filePath, targetDir) => {
       if (code === 0) {
         if ((wantDownload || wantInline) && filePath) {
           try {
