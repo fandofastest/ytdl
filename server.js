@@ -137,11 +137,16 @@ function downloadVideo(videoUrl, format, callback) {
 
   const outputTemplate = path.join(targetDir, '%(id)s.%(ext)s');
 
+  const ffmpegArgs = [];
+  if (process.env.FFMPEG_PATH || process.platform === 'win32') {
+    ffmpegArgs.push('--ffmpeg-location', FFMPEG);
+  }
+
   const args = [
     videoUrl,
     '-o', outputTemplate,
     '--cookies-from-browser', 'brave',
-    '--ffmpeg-location', FFMPEG,
+    ...ffmpegArgs,
   ];
 
   if (isAudio) {
