@@ -185,14 +185,29 @@ function downloadVideo(videoUrl, format, callback) {
 const server = http.createServer((req, res) => {
   const parsedUrl = urlModule.parse(req.url, true);
 
-  if (parsedUrl.pathname === '/download' && req.method === 'GET') {
+  if ((parsedUrl.pathname === '/download' || parsedUrl.pathname === '/stream') && req.method === 'GET') {
     cleanupDownloadsIfLowSpace();
+
     const videoUrl = parsedUrl.query.url;
-    const formatParam = (parsedUrl.query.format || 'mp4').toLowerCase();
+
+    const legacyVideoFlag = parsedUrl.query.video;
+    const isLegacyVideoRequest = legacyVideoFlag && legacyVideoFlag !== '0' && legacyVideoFlag !== 'false';
+
+    let formatParam = (parsedUrl.query.format || 'mp4').toLowerCase();
+    if (parsedUrl.pathname === '/stream') {
+      formatParam = isLegacyVideoRequest ? 'mp4' : 'mp3';
+    }
+
     const dlParam = parsedUrl.query.dl;
-    const wantDownload = dlParam && dlParam !== '0' && dlParam !== 'false';
+    let wantDownload = dlParam && dlParam !== '0' && dlParam !== 'false';
     const playParam = parsedUrl.query.play;
-    const wantInline = playParam && playParam !== '0' && playParam !== 'false';
+    let wantInline = playParam && playParam !== '0' && playParam !== 'false';
+
+    if (parsedUrl.pathname === '/stream') {
+      wantInline = true;
+      wantDownload = false;
+    }
+
     const isAudioRequest = formatParam === 'mp3';
 
     if (!['mp3', 'mp4'].includes(formatParam)) {
