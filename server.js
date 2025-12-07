@@ -150,7 +150,7 @@ function downloadVideo(videoUrl, format, callback) {
   ];
 
   if (isAudio) {
-    args.push('-f', 'bestaudio', '--extract-audio', '--audio-format', 'mp3', '--audio-quality', '0');
+    args.push('--extract-audio', '--audio-format', 'mp3', '--audio-quality', '0');
   } else {
     args.push('-f', 'mp4');
   }
