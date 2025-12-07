@@ -1,0 +1,5 @@
+# Ignore Windows binaries and local tools
+*.exe
+ffmpeg/
+# Node modules (if added later)
+node_modules/

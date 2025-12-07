@@ -1,0 +1,18 @@
+{
+  "name": "ytdl-server",
+  "version": "1.0.0",
+  "description": "Simple yt-dlp HTTP download server with mp3/mp4 output and auto-cleanup",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "yt-dlp",
+    "youtube",
+    "downloader",
+    "ffmpeg"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
