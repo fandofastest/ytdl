@@ -114,19 +114,23 @@ function cleanupDownloadsIfLowSpace() {
 function extractFilePath(stdout) {
   const lines = stdout.split(/\r?\n/);
 
+  let lastPath = null;
+
   for (const line of lines) {
     const destMatch = line.match(/Destination:\s*(.+)$/);
     if (destMatch) {
-      return destMatch[1].trim();
+      lastPath = destMatch[1].trim();
+      continue;
     }
 
     const downloadedMatch = line.match(/\] (.+) has already been downloaded/);
     if (downloadedMatch) {
-      return downloadedMatch[1].trim();
+      lastPath = downloadedMatch[1].trim();
+      continue;
     }
   }
 
-  return null;
+  return lastPath;
 }
 
 function downloadVideo(videoUrl, format, callback) {
