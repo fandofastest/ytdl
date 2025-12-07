@@ -140,7 +140,7 @@ function downloadVideo(videoUrl, format, callback) {
   const args = [
     videoUrl,
     '-o', outputTemplate,
-    '--cookies-from-browser', 'chromium',
+    '--cookies-from-browser', 'brave',
     '--ffmpeg-location', FFMPEG,
   ];
 
